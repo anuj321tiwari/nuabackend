@@ -62,23 +62,35 @@ const File_uploadRoute = () => {
         }
     })
 
-    route.post('/assign-user', async(req, res) => {
+    route.post('/assign-user', VerifyToken(), async(req, res) => {
         const { fileid, user_id } = req.body
-
         try {
-            const usersplit = user_id.split(",")
-          
-            const userID = usersplit.map((item) => {
-                return item
-            })
+            if(!user_id || !Array.isArray(user_id) || user_id.length === 0) {
+                return res.status(400).json({message:"Please select at least one email to share with", status:false})
+            }
 
-            console.log(userID)
             await fileDB.findByIdAndUpdate(fileid, {
-                $addToSet : {sharedWith: userID}
+                $addToSet : {sharedWith: {$each: user_id}}
             })
             return res.status(200).json({message: "File Shared"})
         } catch (error) {
-            console.log()
+            console.log("Error in File_Upload route -- /assign-user -- ", error)
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    })
+
+    route.get('/shared-files', VerifyToken(), async (req, res) => {
+        try {
+            const response = await fileDB.find({
+                $or: [
+                    { ownerID : req.user.id },
+                    {sharedWith: req.user.id}
+                ]
+            })
+            return res.status(200).json(response)
+        } catch (error) {
+            console.log("Error in File_Upload route -- /shared-files -- ", error)
+            return res.status(500).json({message: "Something Went Wrong While Getting Shared Files", status:false})
         }
     })
 
