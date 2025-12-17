@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const file_upload = new mongoose.Schema({
     ownerID : { type : mongoose.Schema.Types.ObjectId },
     filename : { type: String},
+    originalFileName : {type: String},
     type: { type: String },
     size: { type: Number },
     sharedWith: [{type: mongoose.Schema.Types.ObjectId, ref: "user"}],

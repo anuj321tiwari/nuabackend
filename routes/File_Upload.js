@@ -2,6 +2,8 @@ import { Router } from "express";
 import multer from "multer";
 import fileDB from "../models/file_modal.js";
 import VerifyToken from "../middleware/verifytoken.js";
+import crypto from "crypto"
+import fs, { stat } from "fs"
 
 const route = Router()
 
@@ -24,11 +26,12 @@ const File_uploadRoute = () => {
         const uploadedfiles = req.files.map((file) => ({
             ownerID: req.user.id,
             filename: file.filename,
+            originalFileName : file.originalname,
             type: file.mimetype,
             size: file.size,
             sharedWith: [],
             filepath: file.path,
-            sharelink : ""
+            sharelink : crypto.randomBytes(32).toString("hex")
         })) 
 
         try {
@@ -37,6 +40,45 @@ const File_uploadRoute = () => {
         } catch (error) {
             console.log('Error occured in File_Upload route -- /fileupload -- ', error)
             return res.status(500).json({message:"Something went wrong while uploading ", status:false})
+        }
+    })
+
+    route.delete('/file-delete/:id', VerifyToken(), async(req, res) => {
+        try {
+            const checkfile = await fileDB.findById(req.params.id)
+            if(!checkfile) return res.status(400).json({message: "File Does not exists", status:false});
+            fs.unlink(`./uploads/${checkfile.filename}`, (err) => {
+                if(err) {    
+                    console.log("Error in Deliting File From Local Route uploads ", err)
+                    res.status(400).json({message: "Something Went Wrong While Deleting Files", status:false})
+                    return
+                }
+            })
+            await fileDB.findByIdAndDelete(req.params.id)
+            return res.status(200).json({message: "File Is been Deleted", status:true})
+        } catch (error) {
+            console.log("Error in File_Upload route -- /file-delete/:id -- ", error)
+            return res.status(500).json({message: "Something Went Wrong While Deleting Files", status:false})
+        }
+    })
+
+    route.post('/assign-user', async(req, res) => {
+        const { fileid, user_id } = req.body
+
+        try {
+            const usersplit = user_id.split(",")
+          
+            const userID = usersplit.map((item) => {
+                return item
+            })
+
+            console.log(userID)
+            await fileDB.findByIdAndUpdate(fileid, {
+                $addToSet : {sharedWith: userID}
+            })
+            return res.status(200).json({message: "File Shared"})
+        } catch (error) {
+            console.log()
         }
     })
 
