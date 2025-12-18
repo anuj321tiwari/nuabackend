@@ -54,7 +54,7 @@ const AuthRoute = () => {
             res.cookie('Authtoken', Token, {
                 httpOnly:true,
                 sameSite:'lax',
-                secure:false,
+                secure:true, //development false
             })
 
             return res.status(200).json({message:"Login Successful", status:true})

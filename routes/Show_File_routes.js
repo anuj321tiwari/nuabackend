@@ -4,6 +4,7 @@ import VerifyToken from "../middleware/verifytoken.js";
 import User from "../models/users_modal.js";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
+import LinkAuthMiddleware from "../middleware/sharelinktokken.js";
 
 const route = Router()
 
@@ -43,9 +44,9 @@ const Show_File_Routes = () => {
             if(!file) return res.status(400).json({message: "File not found", status: false});
 
             const userId = req.user.id
-            if(file.ownerID !== userId && !file.sharedWith.includes(userId)){
-                return res.status(403).json({message: "Access denied", status:false})
-            }
+            // if(file.ownerID !== userId && !file.sharedWith.includes(userId)){
+            //     return res.status(403).json({message: "Access denied", status:false})
+            // }
             const filepath = join(projectRoute, file.filepath)
             return res.sendFile(filepath)
         } catch (error) {
@@ -54,16 +55,14 @@ const Show_File_Routes = () => {
         }
     })
 
-    route.get('/:sharelink', VerifyToken(), async(req, res) => {
+    route.get('/:sharelink', LinkAuthMiddleware(), async(req, res) => {
+        console.log("hit ")
         console.log(req.params.sharelink)
+        console.log(req.user.id)
         const linkedfile = await fileDB.findOne({ sharelink: req.params.sharelink })
         if(!linkedfile) return res.status(400).json({message: "File not found", status: false})
 
         const filepath = join(projectRoute, linkedfile.filepath)
-        if(!req.user.id){
-            const redirect = encodeURIComponent(req.originalUrl)
-            return res.redirect(`http://localhost:5173/login?redirect=${redirect}`)
-        }
         return res.sendFile(filepath)
     })
     return route

@@ -5,15 +5,17 @@ import AuthRoute from './routes/Auth_route.js'
 import cookieParser from 'cookie-parser'
 import File_uploadRoute from './routes/File_Upload.js'
 import Show_File_Routes from './routes/Show_File_routes.js'
+import compression from 'compression'
 
 const app = express()
+app.use(compression())
 
+app.use(cookieParser())
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
-app.use(cookieParser())
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: ['https://nuafrontend.vercel.app'],
     credentials:true
 }))
 
