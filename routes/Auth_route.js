@@ -3,6 +3,7 @@ import User from "../models/users_modal.js";
 import bcrypt from "bcrypt"
 
 import jwt from "jsonwebtoken"
+import VerifyToken from "../middleware/verifytoken.js";
 
 const route = Router()
 
@@ -60,6 +61,30 @@ const AuthRoute = () => {
         } catch (error) {
             console.log("Error Occured in Auth Route -- /login -- ", error)
             return res.status(500).json({message: "Something went wrong while Login", status: false})
+        }
+    })
+
+    route.get("/check-auth", VerifyToken(), async(req, res) => {
+        const id = req.user.id
+        const email = req.user.email
+        try {
+            if(id && email){
+                return res.status(200).json({ authenticated: true })
+            }else{
+                return res.status(404).json({ authenticated : false})
+            }   
+        } catch (error) {
+            console.log("Error Occured in Auth Route -- /check-auth -- ", error)
+        }
+    })
+
+    route.post('/logout', (req,res) => {
+        try {
+            res.clearCookie('Authtoken')
+            return res.status(200).json({message: "user logout successfully"}) 
+        } catch (error) {
+            console.log("Error Occured in Auth Route -- /logout -- ", error)
+            return res.status(500).json({message:"Something Went Wrong While Logout"})
         }
     })
     return route

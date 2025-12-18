@@ -82,10 +82,7 @@ const File_uploadRoute = () => {
     route.get('/shared-files', VerifyToken(), async (req, res) => {
         try {
             const response = await fileDB.find({
-                $or: [
-                    { ownerID : req.user.id },
-                    {sharedWith: req.user.id}
-                ]
+                sharedWith : req.user.id
             })
             return res.status(200).json(response)
         } catch (error) {

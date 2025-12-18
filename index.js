@@ -17,6 +17,13 @@ app.use(cors({
     credentials:true
 }))
 
+app.use((req, res, next) => {
+    res.setHeader(
+      "Content-Security-Policy",
+      "default-src 'self'; connect-src 'self' http://localhost:8000; frame-src 'self' http://localhost:8000;"
+    );
+    next();
+});
 connectDB()
 
 app.use("/api", AuthRoute())
