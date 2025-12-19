@@ -17,7 +17,7 @@ const Show_File_Routes = () => {
     route.get("/get-allfiles", VerifyToken(), async(req,res) => {
         const id = req.user.id
         try {
-            const response = await fileDB.find({ownerID : id})
+            const response = await fileDB.find({ownerID : id}).sort({createdAt : -1})
             return res.status(200).json(response)
         } catch (error) {
             console.log("Error in Show_File_route -- /get-allfiles -- ", error)
