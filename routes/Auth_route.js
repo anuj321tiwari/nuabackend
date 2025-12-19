@@ -81,7 +81,11 @@ const AuthRoute = () => {
 
     route.post('/logout', (req,res) => {
         try {
-            res.clearCookie('Authtoken')
+            res.clearCookie('Authtoken', {
+                httpOnly: true,
+                secure: true,
+                sameSite: "none"
+            })
             return res.status(200).json({message: "user logout successfully"}) 
         } catch (error) {
             console.log("Error Occured in Auth Route -- /logout -- ", error)
