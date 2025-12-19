@@ -55,7 +55,7 @@ const Show_File_Routes = () => {
         }
     })
 
-    route.get('/:sharelink', LinkAuthMiddleware(), async(req, res) => {
+    route.get('/:sharelink', VerifyToken(), async(req, res) => {
         console.log("hit ")
         console.log(req.params.sharelink)
         console.log(req.user.id)
