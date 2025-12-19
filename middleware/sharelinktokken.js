@@ -9,7 +9,7 @@ const LinkAuthMiddleware = () => {
         if (!token) {
             const redirect = encodeURIComponent(req.originalUrl);
             return res.redirect(
-                `http://localhost:5173/login?redirect=${redirect}`
+                `https://nuafrontend.vercel.app/login?redirect=${redirect}`
             );
         }
     
@@ -21,7 +21,7 @@ const LinkAuthMiddleware = () => {
         } catch (err) {
             const redirect = encodeURIComponent(req.originalUrl);
             return res.redirect(
-                `http://localhost:5173/login?redirect=${redirect}`
+                `https://nuafrontend.vercel.app/login?redirect=${redirect}`
             );
         }
     }
