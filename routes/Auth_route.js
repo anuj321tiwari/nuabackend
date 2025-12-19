@@ -55,6 +55,7 @@ const AuthRoute = () => {
                 httpOnly:true,
                 sameSite:'lax',
                 secure:true, //development false
+                sameSite: "none" //remove in development
             })
 
             return res.status(200).json({message:"Login Successful", status:true})
