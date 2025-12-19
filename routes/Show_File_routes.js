@@ -47,7 +47,8 @@ const Show_File_Routes = () => {
             // if(file.ownerID !== userId && !file.sharedWith.includes(userId)){
             //     return res.status(403).json({message: "Access denied", status:false})
             // }
-            const filepath = join(projectRoute, file.filepath)
+            const normalizedFilePath = file.filepath.replace(/\\/g, "/");
+            const filepath = join(projectRoute, normalizedFilePath)
             return res.sendFile(filepath)
         } catch (error) {
             console.log("Error in Show_File_route -- /files/:id -- ", error)
@@ -61,8 +62,9 @@ const Show_File_Routes = () => {
         console.log(req.user.id)
         const linkedfile = await fileDB.findOne({ sharelink: req.params.sharelink })
         if(!linkedfile) return res.status(400).json({message: "File not found", status: false})
-
-        const filepath = join(projectRoute, linkedfile.filepath)
+        const normalizedFilePath = linkedfile.filepath.replace(/\\/g, "/");
+        const filepath = join(projectRoute, normalizedFilePath)
+        console.log(filepath)
         return res.sendFile(filepath)
     })
     return route
